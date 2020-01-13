@@ -6,6 +6,6 @@ import (
 
 func main() {
 
-	fmt.Println("hey")
+	fmt.Println("DenigmaDisk Love You!")
 
 }
