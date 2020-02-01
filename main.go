@@ -60,7 +60,29 @@ func main() {
 		file.WriteString("Decrypted")
 		file.Sync()
 
+		outr, err := exec.Command("subst.exe", "T:", dir).Output()
+		if (err != nil) || (len(outr) != 0) {
+			panic("Ошибка Инициализации диска.")
+			os.Exit(2)
+		}
+		exec.Command("explorer.exe", "T:\\").Output()
+		os.Exit(0)
+
+		//os.Create("C://DenigmaDisk\\Chek.dat")
+		//file, err = os.OpenFile("C://DenigmaDisk/Chek.log", os.O_RDWR, 0644)
+		//if err != nil {
+		//	panic(err)
+		//}
+		//file.WriteString(string(Encrypter(salt+"zponbest", salt, []byte("check")))[:])
+		//file.Sync()
+
 	}
+
+	//s, _ := os.Open("C://DenigmaDisk/Settings.dat")
+	//b, _ := ioutil.ReadAll(s)
+	//if string(Decrypter(salt+"zponbest", salt, b)[:]) != "check" {
+	//	panic("Error")
+	//}
 
 	s, _ := os.Open("C://DenigmaDisk/Settings.dat")
 	b, _ := ioutil.ReadAll(s)
@@ -94,12 +116,16 @@ func main() {
 	list := Getfiles(dir, logfile)
 	os.Remove(logfile)
 
-	for _, i := range list {
+	allvalue := len(list)
+
+	for here, i := range list {
 		if i == "" {
 			continue
 		}
-
+		fmt.Print(fmt.Sprintf("%.2f", float64(here)/float64(allvalue)*100.0))
+		fmt.Print("% - " + filepath.Base(i))
 		if isdir(i) {
+			fmt.Print(" - (dir)\n")
 			//Decrypt dir name
 			if d == "d" {
 				err := os.Rename(i, filepath.Dir(i)+"/"+string(Decrypter(pass, salt, []byte(filepath.Base(i)))[:]))
@@ -117,7 +143,29 @@ func main() {
 
 			openfile, _ := os.Open(i)
 			b, _ := ioutil.ReadAll(openfile)
+
+			stat, err := openfile.Stat()
+			if err != nil {
+				return
+			}
+
 			openfile.Close()
+
+			var size int64
+			var r string
+			size = stat.Size()
+
+			r = fmt.Sprint(int64(size)) + " Bytes)"
+			if size > 1024 {
+				r = fmt.Sprint(int64(size/1024)) + " KB)"
+			}
+			if size > 1048576 {
+				r = fmt.Sprint(int64(size/1048576)) + " MB)"
+			}
+			if size > 1073741824 {
+				r = fmt.Sprint(int64(size/1073741824)) + " GB)"
+			}
+			fmt.Print(" - (" + r + "\n")
 
 			//Decrypt file and her name
 			if d == "d" {
@@ -166,6 +214,7 @@ func main() {
 			panic("Ошибка Инициализации диска.")
 			os.Exit(2)
 		}
+		exec.Command("explorer.exe", "T:\\").Output()
 
 		file.WriteString("Decrypted")
 		fmt.Println("Decrypted Success!")
